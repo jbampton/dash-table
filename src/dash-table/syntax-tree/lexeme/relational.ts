@@ -40,7 +40,21 @@ export enum RelationalOperator {
     GreaterThan = '>',
     LessOrEqual = '<=',
     LessThan = '<',
-    NotEqual = '!='
+    NotEqual = '!=',
+    IContains = 'icontains',
+    IEqual = 'i=',
+    IGreaterOrEqual = 'i>=',
+    IGreaterThan = 'i>',
+    ILessOrEqual = 'i<=',
+    ILessThan = 'i<',
+    INotEqual = 'i!=',
+    SContains = 'scontains',
+    SEqual = 's=',
+    SGreaterOrEqual = 's>=',
+    SGreaterThan = 's>',
+    SLessOrEqual = 's<=',
+    SLessThan = 's<',
+    SNotEqual = 's!='
 }
 
 const LEXEME_BASE = {
@@ -57,6 +71,7 @@ export const contains: IUnboundedLexeme = R.merge({
         op.toString().indexOf(exp.toString()) !== -1
     ),
     subType: RelationalOperator.Contains,
+    case: 'default',
     regexp: /^(contains)/i
 }, LEXEME_BASE);
 
@@ -67,18 +82,21 @@ export const equal: IUnboundedLexeme = R.merge({
             op === exp
     ),
     subType: RelationalOperator.Equal,
+    case: 'default',
     regexp: /^(=|eq)/i
 }, LEXEME_BASE);
 
 export const greaterOrEqual: IUnboundedLexeme = R.merge({
     evaluate: relationalEvaluator(([op, exp]) => op >= exp),
     subType: RelationalOperator.GreaterOrEqual,
+    case: 'default',
     regexp: /^(>=|ge)/i
 }, LEXEME_BASE);
 
 export const greaterThan: IUnboundedLexeme = R.merge({
     evaluate: relationalEvaluator(([op, exp]) => op > exp),
     subType: RelationalOperator.GreaterThan,
+    case: 'default',
     regexp: /^(>|gt)/i
 }, LEXEME_BASE);
 
@@ -106,17 +124,176 @@ export const dateStartsWith: IUnboundedLexeme = R.merge({
 export const lessOrEqual: IUnboundedLexeme = R.merge({
     evaluate: relationalEvaluator(([op, exp]) => op <= exp),
     subType: RelationalOperator.LessOrEqual,
+    case: 'default',
     regexp: /^(<=|le)/i
 }, LEXEME_BASE);
 
 export const lessThan: IUnboundedLexeme = R.merge({
     evaluate: relationalEvaluator(([op, exp]) => op < exp),
     subType: RelationalOperator.LessThan,
+    case: 'default',
     regexp: /^(<|lt)/i
 }, LEXEME_BASE);
 
 export const notEqual: IUnboundedLexeme = R.merge({
     evaluate: relationalEvaluator(([op, exp]) => op !== exp),
     subType: RelationalOperator.NotEqual,
+    case: 'default',
     regexp: /^(!=|ne)/i
 }, LEXEME_BASE);
+
+export const icontains: IUnboundedLexeme = R.merge({
+  evaluate: relationalEvaluator(([op, exp]) =>
+      !R.isNil(exp) &&
+      !R.isNil(op) &&
+      (R.type(exp) === 'String' || R.type(op) === 'String') &&
+      op.toString().toLowerCase().indexOf(exp.toString().toLowerCase()) !== -1
+  ),
+  subType: RelationalOperator.IContains,
+  case: 'insensitive',
+  regexp: /^(icontains)/i
+}, LEXEME_BASE);
+
+export const iequal: IUnboundedLexeme = R.merge({
+  evaluate: relationalEvaluator(([op, exp]) =>
+      (isNumeric(op) && isNumeric(exp)) ?
+          +op === +exp :
+          op.toLowerCase() === exp.toLowerCase()
+  ),
+  subType: RelationalOperator.IEqual,
+  case: 'insensitive',
+  regexp: /^(i=|ieq)/i
+}, LEXEME_BASE);
+
+export const igreaterOrEqual: IUnboundedLexeme = R.merge({
+  evaluate: relationalEvaluator(([op, exp]) =>
+      (isNumeric(op) && isNumeric(exp)) ?
+          +op >= +exp :
+          op.toLowerCase() >= exp.toLowerCase()),
+subType: RelationalOperator.IGreaterOrEqual,
+case: 'insensitive',
+regexp: /^(i>=|ige)/i
+}, LEXEME_BASE);
+
+export const igreaterThan: IUnboundedLexeme = R.merge({
+  evaluate: relationalEvaluator(([op, exp]) =>
+      (isNumeric(op) && isNumeric(exp)) ?
+          +op > +exp :
+          op.toLowerCase() > exp.toLowerCase()),
+subType: RelationalOperator.IGreaterThan,
+case: 'insensitive',
+regexp: /^(i>|igt)/i
+}, LEXEME_BASE);
+
+export const ilessOrEqual: IUnboundedLexeme = R.merge({
+    evaluate: relationalEvaluator(([op, exp]) =>
+        (isNumeric(op) && isNumeric(exp)) ?
+            +op <= +exp :
+            op.toLowerCase() <= exp.toLowerCase()),
+subType: RelationalOperator.ILessOrEqual,
+case: 'insensitive',
+regexp: /^(i<=|ile)/i
+}, LEXEME_BASE);
+
+export const ilessThan: IUnboundedLexeme = R.merge({
+    evaluate: relationalEvaluator(([op, exp]) =>
+        (isNumeric(op) && isNumeric(exp)) ?
+            +op < +exp :
+            op.toLowerCase() < exp.toLowerCase()),
+subType: RelationalOperator.ILessThan,
+case: 'insensitive',
+regexp: /^(i<|ilt)/i
+}, LEXEME_BASE);
+
+export const inotEqual: IUnboundedLexeme = R.merge({
+  evaluate: relationalEvaluator(([op, exp]) =>
+      (isNumeric(op) && isNumeric(exp)) ?
+          +op !== +exp :
+          op.toLowerCase() !== exp.toLowerCase()),
+subType: RelationalOperator.INotEqual,
+case: 'insensitive',
+regexp: /^(i!=|ine)/i
+}, LEXEME_BASE);
+
+export const scontains: IUnboundedLexeme = R.merge({
+  evaluate: relationalEvaluator(([op, exp]) =>
+      !R.isNil(exp) &&
+      !R.isNil(op) &&
+      (R.type(exp) === 'String' || R.type(op) === 'String') &&
+      op.toString().indexOf(exp.toString()) !== -1
+  ),
+  subType: RelationalOperator.SContains,
+  case: 'insensitive',
+  regexp: /^(scontains)/i
+}, LEXEME_BASE);
+
+export const sequal: IUnboundedLexeme = R.merge({
+    evaluate: relationalEvaluator(([op, exp]) =>
+        (isNumeric(op) && isNumeric(exp)) ?
+            +op === +exp :
+            op === exp
+    ),
+    sType: RelationalOperator.SEqual,
+    case: 'insensitive',
+    regexp: /^(s=|seq)/i
+}, LEXEME_BASE);
+
+export const sgreaterOrEqual: IUnboundedLexeme = R.merge({
+    evaluate: relationalEvaluator(([op, exp]) =>
+        (isNumeric(op) && isNumeric(exp)) ?
+            +op >= +exp :
+            op >= exp),
+subType: RelationalOperator.SGreaterOrEqual,
+case: 'sensitive',
+regexp: /^(s>=|sge)/i
+}, LEXEME_BASE);
+
+export const sgreaterThan: IUnboundedLexeme = R.merge({
+  evaluate: relationalEvaluator(([op, exp]) =>
+      (isNumeric(op) && isNumeric(exp)) ?
+          +op > +exp :
+          op > exp),
+subType: RelationalOperator.SGreaterThan,
+case: 'sensitive',
+regexp: /^(s>|sgt)/i
+}, LEXEME_BASE);
+
+export const slessOrEqual: IUnboundedLexeme = R.merge({
+    evaluate: relationalEvaluator(([op, exp]) =>
+        (isNumeric(op) && isNumeric(exp)) ?
+            +op <= +exp :
+            op <= exp),
+subType: RelationalOperator.SLessOrEqual,
+case: 'sensitive',
+regexp: /^(s<=|sle)/i
+}, LEXEME_BASE);
+
+export const slessThan: IUnboundedLexeme = R.merge({
+    evaluate: relationalEvaluator(([op, exp]) =>
+        (isNumeric(op) && isNumeric(exp)) ?
+            +op < +exp :
+            op < exp),
+subType: RelationalOperator.SLessThan,
+case: 'sensitive',
+regexp: /^(s<|slt)/i
+}, LEXEME_BASE);
+
+export const snotEqual: IUnboundedLexeme = R.merge({
+  evaluate: relationalEvaluator(([op, exp]) =>
+      (isNumeric(op) && isNumeric(exp)) ?
+          +op !== +exp :
+          op !== exp),
+subType: RelationalOperator.SNotEqual,
+case: 'sensitive',
+regexp: /^(s!=|sne)/i
+}, LEXEME_BASE);
+
+export const CaseMapping = new Map([
+    [RelationalOperator.Contains, scontains],
+    [RelationalOperator.Equal, sequal],
+    [RelationalOperator.GreaterOrEqual, sgreaterOrEqual],
+    [RelationalOperator.GreaterThan, sgreaterThan],
+    [RelationalOperator.LessOrEqual, slessOrEqual],
+    [RelationalOperator.LessThan, slessThan],
+    [RelationalOperator.NotEqual, snotEqual]
+]);
